@@ -23,11 +23,13 @@ class HuaweiPushConnector extends PushConnector {
   }
 
   @override
-  Future<void> configure(
-      {MessageHandler? onMessage,
-      MessageHandler? onLaunch,
-      MessageHandler? onResume,
-      MessageHandler? onBackgroundMessage}) {
+  Future<void> configure({
+    MessageHandler? onMessage,
+    MessageHandler? onLaunch,
+    MessageHandler? onResume,
+    MessageHandler? onBackgroundMessage,
+    FirebaseMessageHandler? onBackgroundMessageFirebase,
+  }) {
     Push.getTokenStream.listen((event) {
       token.value = event;
     }, onError: (error) {

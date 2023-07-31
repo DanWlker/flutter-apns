@@ -5,8 +5,14 @@ import 'connector.dart';
 
 class ApnsPushConnector extends ApnsPushConnectorOnly implements PushConnector {
   @override
-  Future<void> configure(
-      {onMessage, onLaunch, onResume, onBackgroundMessage, options}) {
+  Future<void> configure({
+    onMessage,
+    onLaunch,
+    onResume,
+    onBackgroundMessage,
+    options,
+    onBackgroundMessageFirebase,
+  }) {
     ApnsMessageHandler? mapHandler(MessageHandler? input) {
       if (input == null) {
         return null;

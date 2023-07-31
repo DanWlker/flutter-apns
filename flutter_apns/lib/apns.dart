@@ -21,6 +21,7 @@ Future<PushConnector> createPushConnector() async {
     } on PlatformException {
       availability = GooglePlayServicesAvailability.unknown;
     }
+    print('availability is $availability');
     if (availability == GooglePlayServicesAvailability.success) {
       return FirebasePushConnector();
     }

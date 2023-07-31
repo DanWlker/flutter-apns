@@ -1,15 +1,12 @@
 import 'package:flutter_apns/src/connector.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class FirebasePushConnector extends PushConnector {
-  late final firebase = FirebaseMessaging.instance;
+  static FirebaseMessaging get firebase => FirebaseMessaging.instance;
 
   @override
   final isDisabledByUser = ValueNotifier<bool?>(null);
-
-  bool didInitialize = false;
 
   @override
   Future<void> configure({
@@ -17,12 +14,8 @@ class FirebasePushConnector extends PushConnector {
     MessageHandler? onLaunch,
     MessageHandler? onResume,
     MessageHandler? onBackgroundMessage,
+    FirebaseMessageHandler? onBackgroundMessageFirebase,
   }) async {
-    if (!didInitialize) {
-      await Firebase.initializeApp();
-      didInitialize = true;
-    }
-
     firebase.onTokenRefresh.listen((value) {
       token.value = value;
     });
@@ -31,9 +24,8 @@ class FirebasePushConnector extends PushConnector {
     FirebaseMessaging.onMessageOpenedApp
         .listen((data) => onResume?.call(data.toMap()));
 
-    if (onBackgroundMessage != null) {
-      FirebaseMessaging.onBackgroundMessage(
-          (data) => onBackgroundMessage(data.toMap()));
+    if (onBackgroundMessageFirebase != null) {
+      FirebaseMessaging.onBackgroundMessage(onBackgroundMessageFirebase);
     }
 
     final initial = await FirebaseMessaging.instance.getInitialMessage();
@@ -49,11 +41,6 @@ class FirebasePushConnector extends PushConnector {
 
   @override
   void requestNotificationPermissions() async {
-    if (!didInitialize) {
-      await Firebase.initializeApp();
-      didInitialize = true;
-    }
-
     NotificationSettings permissions = await firebase.requestPermission(
       alert: true,
       announcement: false,

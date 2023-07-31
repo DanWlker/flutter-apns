@@ -1,7 +1,9 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
 /// Function signature for callbacks executed when push message is available;
 typedef Future<void> MessageHandler(Map<String, dynamic> message);
+typedef Future<void> FirebaseMessageHandler(RemoteMessage message);
 
 /// Interface for either APNS or Firebase connector, implementing common features.
 abstract class PushConnector {
@@ -24,6 +26,8 @@ abstract class PushConnector {
     MessageHandler? onLaunch,
     MessageHandler? onResume,
     MessageHandler? onBackgroundMessage,
+    // Firebase only: must be a top level function
+    FirebaseMessageHandler? onBackgroundMessageFirebase,
   });
 
   /// Prompts (if need) the user to enable push notifications.
