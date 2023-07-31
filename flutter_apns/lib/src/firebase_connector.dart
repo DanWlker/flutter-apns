@@ -17,12 +17,9 @@ class FirebasePushConnector extends PushConnector {
     MessageHandler? onLaunch,
     MessageHandler? onResume,
     MessageHandler? onBackgroundMessage,
-    FirebaseOptions? options,
   }) async {
     if (!didInitialize) {
-      await Firebase.initializeApp(
-        options: options,
-      );
+      await Firebase.initializeApp();
       didInitialize = true;
     }
 
@@ -30,16 +27,18 @@ class FirebasePushConnector extends PushConnector {
       token.value = value;
     });
 
-    FirebaseMessaging.onMessage.listen(onMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(onResume);
+    FirebaseMessaging.onMessage.listen((data) => onMessage?.call(data.toMap()));
+    FirebaseMessaging.onMessageOpenedApp
+        .listen((data) => onResume?.call(data.toMap()));
 
     if (onBackgroundMessage != null) {
-      FirebaseMessaging.onBackgroundMessage(onBackgroundMessage);
+      FirebaseMessaging.onBackgroundMessage(
+          (data) => onBackgroundMessage(data.toMap()));
     }
 
     final initial = await FirebaseMessaging.instance.getInitialMessage();
     if (initial != null) {
-      onLaunch?.call(initial);
+      onLaunch?.call(initial.toMap());
     }
 
     token.value = await firebase.getToken();
